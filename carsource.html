@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Racing Game Source Code</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="carsource.css">
+    <link rel="icon" type="image" href="Screenshot 2025-05-09 140453.png">
+    <link rel="stylesheet" href="carsource.css">
+    
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FlexCode Studio</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="About.html">Social Media</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <a class="back-link" href="SourceCode.html">&larr; Back to All Projects</a>
+
+        <h2 class="code-title">
+            <img src="multiple-cars-in-game.png" alt="Car Racing" >
+            Car Racing Game Source Code
+        </h2>
+        <div style="text-align:center;max-width:700px;margin:0 auto 32px auto;color:#222;">
+            <p>
+                In this project, we are going to create a <b>Car Racing Game</b> using <b>HTML</b>, <b>CSS</b>, and <b>JavaScript</b>.  
+                Each language has its own role:
+            </p>
+            <ul style="text-align:left;display:inline-block;">
+                <li><b>HTML</b> is used to build the structure of the game (the game area, score, and car elements).</li>
+                <li><b>CSS</b> is used to style the game, make it look modern, and position the cars and road.</li>
+                <li><b>JavaScript</b> is used to add interactivity, move the cars, detect collisions, and keep score.</li>
+            </ul>
+            <p>
+                Below you will find the full source code for each part, with comments to help you understand what each section does.
+            </p>
+        </div>
+        <div class="code-container">
+            <br>
+            <br>
+            <h3 style="color:#FFD700;text-align:center;">HTML</h3>
+            <pre>
+&lt;!-- HTML builds the structure of the game. We use divs for the game area, score, and cars. --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Car Racing Game&lt;/title&gt;
+    &lt;link rel="stylesheet" href="car.css"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="game"&gt;
+        &lt;div class="score"&gt;Score: 0&lt;/div&gt;
+        &lt;div class="highScore"&gt;High Score: 0&lt;/div&gt;
+        &lt;div class="startScreen"&gt;Press Here or SPACE to Start&lt;/div&gt;
+        &lt;div class="playerCar"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script src="car.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+            </pre>
+
+            <br>
+            <br>
+            <h3 style="color:#FFD700;text-align:center;">CSS</h3>
+            
+            <pre>
+/* CSS makes the game look good and positions everything. 
+   We use gradients for background, flex and absolute positioning for layout, 
+   and background images for the cars. */
+body {
+    background: linear-gradient(120deg, #232526 0%, #414345 100%);
+}
+.game {
+    position: relative;
+    width: 400px;
+    height: 600px;
+    margin: 40px auto;
+    background: #222;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.18);
+}
+.score, .highScore {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    color: #fff;
+    font-size: 1.2em;
+    z-index: 10;
+    text-shadow: 0 2px 8px #000;
+}
+.highScore {
+    top: 40px;
+    font-size: 1em;
+    color: #ffd700;
+}
+.startScreen {
+    width: 80%;
+    height: 120px;
+    line-height: 30px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    background-color: rgba(43, 205, 226, 0.95);
+    text-align: center;
+    border-radius: 10px;
+    border-bottom: 2px solid rgb(132, 197, 197);
+    font-size: 1.3em;
+    color: #222;
+    cursor: pointer;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+.playerCar {
+    position: absolute;
+    width: 50px;
+    height: 80px;
+    bottom: 20px;
+    left: 175px;
+    background: url('car.png') no-repeat center/cover;
+    z-index: 5;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px #0008;
+}
+.roadLine {
+    position: absolute;
+    width: 8px;
+    height: 80px;
+    background: #fff;
+    left: 196px;
+    z-index: 1;
+    border-radius: 4px;
+    opacity: 0.7;
+}
+.enemyCar {
+    position: absolute;
+    width: 50px;
+    height: 80px;
+    background: url('opponent.png') no-repeat center/cover;
+    z-index: 6;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px #0006;
+}      
+            </pre>
+
+            <br>
+            <br>
+            <h3 style="color:#FFD700;text-align:center;">JavaScript</h3>
+            
+            <pre>
+
+// JavaScript brings the game to life! 
+// It moves the cars, checks for collisions, updates the score, and handles keyboard input.
+const gameArea = document.querySelector('.game');
+const scoreElem = document.querySelector('.score');
+const highScoreElem = document.querySelector('.highScore');
+const startScreen = document.querySelector('.startScreen');
+const playerCar = document.querySelector('.playerCar');
+
+let player = { speed: 5, score: 0, inPlay: false, x: 0, y: 0 };
+let keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
+let roadLines = [];
+let enemies = [];
+let highScore = localStorage.getItem('carHighScore') || 0;
+
+highScoreElem.textContent = "High Score: " + highScore;
+
+function startGame() {
+    startScreen.style.display = 'none';
+    player.inPlay = true;
+    player.score = 0;
+    player.x = 175;
+    player.y = 500;
+    playerCar.style.left = player.x + 'px';
+    playerCar.style.top = player.y + 'px';
+
+    // Remove old lines and enemies
+    document.querySelectorAll('.roadLine, .enemyCar').forEach(e => e.remove());
+    roadLines = [];
+    enemies = [];
+
+    // Create road lines
+    for (let i = 0; i < 6; i++) {
+        let line = document.createElement('div');
+        line.className = 'roadLine';
+        line.style.top = (i * 100) + 'px';
+        gameArea.appendChild(line);
+        roadLines.push(line);
+    }
+
+    // Create enemy cars
+    for (let i = 0; i < 3; i++) {
+        let enemy = document.createElement('div');
+        enemy.className = 'enemyCar';
+        enemy.style.top = (Math.random() * -300) + 'px';
+        enemy.style.left = (Math.floor(Math.random() * 7) * 50) + 'px';
+        gameArea.appendChild(enemy);
+        enemies.push(enemy);
+    }
+
+    window.requestAnimationFrame(playGame);
+}
+
+function playGame() {
+    if (!player.inPlay) return;
+
+    moveLines();
+    moveEnemies();
+
+    // Player movement
+    if (keys.ArrowLeft && player.x > 0) player.x -= player.speed;
+    if (keys.ArrowRight && player.x < 350) player.x += player.speed;
+    if (keys.ArrowUp && player.y > 0) player.y -= player.speed;
+    if (keys.ArrowDown && player.y < 520) player.y += player.speed;
+
+    playerCar.style.left = player.x + 'px';
+    playerCar.style.top = player.y + 'px';
+
+    player.score++;
+    scoreElem.textContent = "Score: " + player.score;
+
+    // Update high score
+    if (player.score > highScore) {
+        highScore = player.score;
+        highScoreElem.textContent = "High Score: " + highScore;
+        localStorage.setItem('carHighScore', highScore);
+    }
+
+    window.requestAnimationFrame(playGame);
+}
+
+function moveLines() {
+    roadLines.forEach(line => {
+        let top = parseInt(line.style.top);
+        top += player.speed;
+        if (top > 600) top = -80;
+        line.style.top = top + 'px';
+    });
+}
+
+function moveEnemies() {
+    enemies.forEach(enemy => {
+        let top = parseInt(enemy.style.top);
+        top += player.speed + 2;
+        if (top > 600) {
+            top = Math.random() * -200;
+            enemy.style.left = (Math.floor(Math.random() * 7) * 50) + 'px';
+        }
+        enemy.style.top = top + 'px';
+
+        // Collision detection
+        if (isCollide(playerCar, enemy)) {
+            endGame();
+        }
+    });
+}
+
+function isCollide(a, b) {
+    let aRect = a.getBoundingClientRect();
+    let bRect = b.getBoundingClientRect();
+    return !(
+        aRect.bottom < bRect.top ||
+        aRect.top > bRect.bottom ||
+        aRect.right < bRect.left ||
+        aRect.left > bRect.right
+    );
+}
+
+function endGame() {
+    player.inPlay = false;
+    startScreen.style.display = 'block';
+    startScreen.textContent = "Game Over! Your Score: " + player.score + " | Click or Press SPACE to Restart";
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key in keys) {
+        keys[e.key] = true;
+    }
+    if (!player.inPlay && (e.key === " " || e.key === "Spacebar")) {
+        startGame();
+    }
+});
+document.addEventListener('keyup', e => {
+    if (e.key in keys) {
+        keys[e.key] = false;
+    }
+});
+
+startScreen.addEventListener('click', startGame);
+
+window.onload = () => {
+    startScreen.style.display = 'block';
+    scoreElem.textContent = "Score: 0";
+    highScoreElem.textContent = "High Score: " + highScore;
+}
+            </pre>
+
+            <footer>
+                &copy; 2025 FlexCode Studio. All rights reserved.
+
+               <p> Note: You will need to provide your own images for <b>'car.png', 'opponent.png', and 'multiple-cars-in-game.png'.</b> 
+                You can create your own, use free resources, or search for suitable car images online. 
+                Place these images in the same folder as your HTML file for the game to display correctly. </p>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>
